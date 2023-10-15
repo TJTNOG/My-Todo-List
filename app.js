@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
+const bodyParser = require('body-parser')
 const Todo = require('./models/todo')
 
 const port = 3000
@@ -30,6 +31,19 @@ app.get('/', (req, res) => {
   .then(todos => res.render('index', { todos }))
   .catch(error => console.error(error))
 })
+
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.get('/todos/new', (req, res) => {
+  return res.render('new')
+})
+
+app.post("/todos", (req, res) => {
+  const name = req.body.name; 
+  return Todo.create({ name }) 
+    .then(() => res.redirect("/")) 
+    .catch((error) => console.log(error));
+});
 
 app.listen(port, () => {
   console.log(`App is running on http://localhost:${port}`);

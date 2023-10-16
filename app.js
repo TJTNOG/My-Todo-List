@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
+const methodOverride = require("method-override");
 const Todo = require('./models/todo')
 
 const port = 3000
@@ -35,6 +36,8 @@ app.get('/', (req, res) => {
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.use(methodOverride('_method'))
+
 app.get('/todos/new', (req, res) => {
   return res.render('new')
 })
@@ -62,7 +65,7 @@ app.get("/todos/:id/edit", (req, res) => {
     .catch((error) => console.log(error));
 });
 
-app.post("/todos/:id/edit", (req, res) => {
+app.put("/todos/:id", (req, res) => {
   const id = req.params.id;
   const {name, isDone} = req.body
   return Todo.findById(id)
@@ -75,13 +78,14 @@ app.post("/todos/:id/edit", (req, res) => {
     .catch((error) => console.log(error));
 });
 
-app.post('/todos/:id/delete', (req, res) => {
+app.delete('/todos/:id', (req, res) => {
   const id = req.params.id
   return Todo.findById(id)
   .then(todo => todo.remove())
   .then(() => res.redirect('/'))
   .catch(error => console.log(error))
 })
+
 app.listen(port, () => {
   console.log(`App is running on http://localhost:${port}`);
 })
